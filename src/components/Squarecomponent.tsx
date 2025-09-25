@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoxComponent from "./BoxComponent";
 
 
@@ -28,13 +28,22 @@ const randomcolor = () => {
 const Squarecomponent = () => {
 
     const [box,setBox] = useState<Boxtype[]>(initialSate);
+    const [color,setColor] = useState<string>("rgb(200,200,200)")
+
+    useEffect(() => {
+        setColor(box.find(b => b.active === true)?.color || "rgb(200,200,200)");
+    }, [box]);
 
     const setBoxCount = (id: string) => {
         setBox(box.map(b => id === b.id ? {...b, count : b.count+1,active: true} : {...b, active : false}));
     }
 
     const setBoxColor = () => {
-        setBox(box.map(b => b.active ? ({...b, color : randomcolor()}) : b));
+        const colors = Array.from({length:3}, () => randomcolor());
+        const rndColor = colors[Math.floor(Math.random()*3)]
+        setBox(box.map(b => b.active ? ({...b, color : rndColor}) : b));
+        //setColor(box.find(b => b.active === true)!.color);
+        setColor(rndColor);
     }
     const resetAll = () => {
     setBox(initialSate);
@@ -48,7 +57,7 @@ const Squarecomponent = () => {
                {box.map(b => <BoxComponent id={b.id!} color={b.color} count={b.count} active={false} setFn={() => setBoxCount(b.id)}/>)}
             </div>
 
-            <button onClick={setBoxColor}>Színezz!</button>
+            <button style={{background:color}} onClick={setBoxColor}>Színezz!</button>
 
             <button onClick={resetAll}>Reset</button>
 
