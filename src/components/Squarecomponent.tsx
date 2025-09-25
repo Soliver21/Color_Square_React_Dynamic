@@ -1,9 +1,22 @@
-import BoxComponent from "./BoxComponent";
 import { useState } from "react";
+import BoxComponent from "./BoxComponent";
+
+
+type Boxtype = {
+    id: string;
+    color: string;
+    count: number;
+    active: boolean;
+}
+
+const initialSate : Boxtype[] = [
+    {id:"a", color: "rgb(200,200,200)", count:0, active : false},
+    {id:"b", color: "rgb(200,200,200)", count:0, active : false},
+    {id:"c", color: "rgb(200,200,200)", count:0, active : false},
+];
 
 const randomNum = () => Math.floor(Math.random()*256);
 
-const resetColor = () => "#000";
 
 const randomcolor = () => {
         const r = randomNum()
@@ -14,36 +27,30 @@ const randomcolor = () => {
 
 const Squarecomponent = () => {
 
-   /*  const [color,setcolor] = useState<string>("rgb(0,0,0)");
-    const [count, setcount] = useState(0);
- */
-    const [box, setBox] = useState({bgColor: "rgb(0,0,0)", bgCount:0});
+    const [box,setBox] = useState<Boxtype[]>(initialSate);
 
-    
+    const setBoxCount = (id: string) => {
+        setBox(box.map(b => id === b.id ? {...b, count : b.count+1,active: true} : {...b, active : false}));
+    }
 
-    const setBoxColor = () => setBox(prev => ({...prev, bgColor:randomcolor()}));
-    const setBoxCount = () => setBox(prev => ({...prev, bgCount : prev.bgCount === 10 ? 0 : prev.bgCount +1}));
+    const setBoxColor = () => {
+        setBox(box.map(b => b.active ? ({...b, color : randomcolor()}) : b));
+    }
+    const resetAll = () => {
+    setBox(initialSate);
+    } 
 
     return(
         <main style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", gap:"2rem"}}>
-            <h3>A szín kódja: {box.bgColor}</h3>
+            <h3>A szín kódja: {box.find(b => b.active === true)?.color}</h3>
 
-            {/*<div className="box" style={{width: "10rem", height:"10rem", boxShadow:"0 0 10px 3px white inset",      borderRadius: "7px", background:`${color}`, alignContent:"center", justifyContent:"center"}} 
-            onClick={() => setcount(prev => prev +1)}  
-            >{count}</div> */}
-
-            <div style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "center",gap:"2rem"}}>
-                <BoxComponent  color={box.bgColor} count={box.bgCount} setFn={setBoxCount} />
-                <BoxComponent color={box.bgColor} count={box.bgCount} setFn={setBoxCount} />
-                <BoxComponent color={box.bgColor} count={box.bgCount} setFn={setBoxCount} />
+            <div className="row" style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "center",gap:"2rem"}}>
+               {box.map(b => <BoxComponent id={b.id!} color={b.color} count={b.count} active={false} setFn={() => setBoxCount(b.id)}/>)}
             </div>
 
             <button onClick={setBoxColor}>Színezz!</button>
 
-            <button onClick={()=> {
-                setBox(prev => ({...prev, bgColor: resetColor()}));
-                setBox(prev => ({...prev, bgCount: 0}));
-            }}>Reset</button>
+            <button onClick={resetAll}>Reset</button>
 
         </main>
     )
